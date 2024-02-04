@@ -4,7 +4,7 @@ import Container from "../../components/Container";
 import FormWrap from "../../components/FormWrap";
 import EditSongForm from "./EditSongFrom";
 interface IParams{
-    songId:string
+    id:string
 }
 const EditSongs = ({params}:{params:IParams}) => {
     // const router = useRouter();

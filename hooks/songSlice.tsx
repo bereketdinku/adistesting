@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction } from "@reduxjs/toolkit";
 
+// Your Song type (replace with your actual type)
 type SongType = {
   id: string;
   title: string;
@@ -8,32 +10,24 @@ type SongType = {
   generes: string;
   // ... other properties
 };
-
-type SongState = {
-  songs: SongType[];
-  isLoading: boolean;
-};
-
-const initialState: SongState = {
-  songs: [],
-  isLoading: false,
-};
-
-const songSlice = createSlice({
+export const songSlice = createSlice({
   name: "songs",
-  initialState,
+  initialState: {
+    songs: [] as SongType[],
+    isLoading: false,
+  },
   reducers: {
     getSongsFetch: (state) => {
       state.isLoading = true;
     },
-    getSongsSuccess: (state, action: PayloadAction<SongType[]>) => {
+    getSongsSuccess: (state, action) => {
       state.songs = action.payload;
       state.isLoading = false;
     },
-    addSong: (state, action: PayloadAction<SongType>) => {
-      state.songs.push(action.payload);
+    addSong: (state, action) => {
+      state.songs = action.payload;
     },
-    setSongs: (state, action: PayloadAction<SongType[]>) => {
+    setSongs: (state, action) => {
       state.songs = action.payload;
     },
     updateSong: (
@@ -46,20 +40,18 @@ const songSlice = createSlice({
         state.songs[index] = updatedSong;
       }
     },
-    deleteSong: (state, action: PayloadAction<{ id: string }>) => {
+    deleteSong: (state, action) => {
       const { id } = action.payload;
       state.songs = state.songs.filter((song) => song.id !== id);
     },
   },
 });
-
 export const {
   getSongsFetch,
-  getSongsSuccess,
   addSong,
+  getSongsSuccess,
   setSongs,
   updateSong,
   deleteSong,
 } = songSlice.actions;
-
 export default songSlice.reducer;

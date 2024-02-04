@@ -52,7 +52,7 @@ const EditSongForm = ({ songId }: { songId: string }) => {
         await axios.put(`https://backend-ipfr.onrender.com/api/${songId}`, data);
 
         // Dispatch the updateSong action with the updated song data
-        // dispatch(updateSong({ id: songId, updatedSong: data }));
+        // dispatch(updateSong({ id: songId, }));
 
         // Display success toast and navigate back to manage songs
         toast.success('Song updated successfully');
@@ -66,7 +66,7 @@ const EditSongForm = ({ songId }: { songId: string }) => {
         setIsLoading(false);
       }
     },
-    [dispatch, router, songId]
+    [ router, songId]
   );
 
   return (

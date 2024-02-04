@@ -16,7 +16,7 @@ const ManageSongClient = () => {
   const songsState = useSelector((state: RootState) => state.songs);
   const dispatch=useDispatch()
   const songsArray = songsState.songs?.songs || [];
-  console.log(songsArray)
+  console.log(songsState)
   
   useEffect(()=>{
 dispatch(getSongsFetch())
@@ -79,7 +79,7 @@ dispatch(getSongsFetch())
         toast.error("Failed to delete product")
         console.log(err);
     })
- },[])
+ },[router])
 
   return (
     <div className="max-w-[1150px] m-auto text-xl">
