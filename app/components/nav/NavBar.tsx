@@ -37,13 +37,7 @@ const NavBar = () => {
               selected={pathname === "/manage-songs"}
             />
           </Link>
-          <Link href={"/admin/manage-orders"}>
-            <AdminNavItem
-              label="ManageOrders"
-              icon={MdFormatListBulleted}
-              selected={pathname === "/admin/manage-orders"}
-            />
-          </Link>
+         
         </div>
       </Container>
     </div>

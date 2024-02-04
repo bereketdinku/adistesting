@@ -1,8 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Heading from "./components/Heading";
 import { formatNumber } from "@/utils/formatNumber";
-
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from "@/hooks/rootReducer";
+import { getSongsFetch, getSongsSuccess } from "@/hooks/songSlice";
+type SongType = {
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  genres: string[];
+  // ... other properties
+};
 type SummaryDataType = {
   [key: string]: {
     label: string;
@@ -10,6 +20,118 @@ type SummaryDataType = {
   };
 };
 const Summary = () => {
+  const songsState = useSelector((state: RootState) => state.songs);
+  const dispatch=useDispatch()
+  useEffect(()=>{
+dispatch(getSongsFetch())
+  },[dispatch])
+  console.log(songsState.songs)
+  const calculateSummary = () => {
+    let totalSongs = songsState.songs.length;
+    let uniqueAlbums = new Set<string>();
+    let uniqueArtists = new Set<string>();
+    let uniqueGenres = new Set<string>();
+    let artistSongCount: { [artist: string]: number } = {};
+  let artistAlbumCount: { [artist: string]: number } = {};
+  
+    songsState.songs.map((song) => {
+      uniqueAlbums.add(song.album);
+      uniqueArtists.add(song.artist);
+      uniqueGenres = new Set([...uniqueGenres, ...song.generes]);
+      if (artistSongCount[song.artist]) {
+        artistSongCount[song.artist]++;
+      } else {
+        artistSongCount[song.artist] = 1;
+      }
+  
+      // Count albums per artist
+      if (artistAlbumCount[song.artist]) {
+        artistAlbumCount[song.artist]++;
+      } else {
+        artistAlbumCount[song.artist] = 1;
+      }
+  
+    });
+  
+    const totalAlbums = uniqueAlbums.size;
+    const totalArtists = uniqueArtists.size;
+    const totalGenres = uniqueGenres.size;
+  
+    return {
+      songs: totalSongs,
+      albums: totalAlbums,
+      artists: totalArtists,
+      genres: totalGenres,
+    };
+  };
+  
+  useEffect(() => {
+    const calculateSummary = () => {
+      const songsArray = songsState.songs?.songs || []; // Access the songs array within the object
+    
+      let totalSongs = songsArray.length;
+      let uniqueAlbums = new Set<string>();
+      let uniqueArtists = new Set<string>();
+      let uniqueGenres = new Set<string>();
+      let artistSongCount: { [artist: string]: number } = {};
+      let albumSongCount: { [album: string]: number } = {};
+  let artistAlbumCount: { [artist: string]: number } = {};
+      songsArray.map((song: { album: string; artist: string; generes: any; }) => {
+        uniqueAlbums.add(song.album);
+        uniqueArtists.add(song.artist);
+        uniqueGenres.add(song.generes);
+        if (artistSongCount[song.artist]) {
+          artistSongCount[song.artist]++;
+        } else {
+          artistSongCount[song.artist] = 1;
+        }
+  
+        // Count albums per artist
+        if (artistAlbumCount[song.artist]) {
+          artistAlbumCount[song.artist]++;
+        } else {
+          artistAlbumCount[song.artist] = 1;
+        }
+  
+        // Count songs per album
+        if (albumSongCount[song.album]) {
+          albumSongCount[song.album]++;
+        } else {
+          albumSongCount[song.album] = 1;
+        }
+    
+
+      });
+    
+      const totalAlbums = uniqueAlbums.size;
+      const totalArtists = uniqueArtists.size;
+      const totalGenres = uniqueGenres.size;
+      
+    
+      return {
+        songs: totalSongs,
+        albums: totalAlbums,
+        artists: totalArtists,
+        genres: totalGenres,
+        artistSummary: { ...artistSongCount, ...artistAlbumCount },
+      albumSongCount: albumSongCount,
+      };
+    };
+    
+      
+      const summary = calculateSummary();
+      setSummaryData({
+        songs: { label: "Total Songs", digit: summary.songs },
+        albums: { label: "Total Albums", digit: summary.albums },
+        artists: { label: "Total Artists", digit: summary.artists },
+        genres: { label: "Total Genres", digit: summary.genres },
+       
+      });
+    
+  }, [songsState.songs]);
+  
+
+
   const [summaryData, setSummaryData] = useState<SummaryDataType>({
     sale: {
       label: "Total Sale",
@@ -40,7 +162,7 @@ const Summary = () => {
   return (
     <div className="max-w-[1150px] m-auto">
       <div className="m-4 mt-8">
-        <Heading title="Stats" center />
+        <Heading title="Statistics" center />
       </div>
       <div className="grid grid-cols-2 gap-3 max-h-50vh overflow-y-auto">
         {SummaryKeys &&

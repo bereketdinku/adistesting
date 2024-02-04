@@ -1,4 +1,5 @@
 import { call, put, takeEvery, takeLatest } from "redux-saga/effects";
+import axios, { AxiosResponse } from "axios";
 import {
   getSongsSuccess,
   setSongs,
@@ -7,57 +8,100 @@ import {
   deleteSong,
 } from "./songSlice";
 
-function* workGetSongsFetch(): Generator<any, void, any> {
-  try {
-    const songs = yield call(() => fetch("")); // Replace with your actual API call
-    const formattedSongs = yield songs.json();
-    const formattedSongsShortened = formattedSongs.slice(0, 10);
-    yield put(getSongsSuccess(formattedSongsShortened));
-  } catch (error) {
-    //   yield put(getSongsFailure(error));
-  }
+const apiUrl = 'https://backend-ipfr.onrender.com/api/';
+
+interface ApiResponse<T> {
+  data: T;
 }
-function* fetchSongsAsync(): Generator<any, void, any> {
+
+interface AddSongAction {
+  type: string;
+  payload: { type: string; payload: any }; // Update this based on your actual action type
+}
+
+function* fetchSongsFromApi(): Generator<any, any, AxiosResponse<ApiResponse<any>>> {
   try {
-    const response = yield call(() => fetch(""));
-    yield put(setSongs(response.data));
+    const response: AxiosResponse<ApiResponse<any>> = yield call(() => axios.get(apiUrl));
+    return response.data;
   } catch (error) {
-    console.error("Error fetching songs:", error);
+    console.error('Error fetching songs:', error);
+    throw error;
   }
 }
 
-function* addSongAsync(action: { payload: any }): Generator<any, void, any> {
+function* addSongToApi(action: AddSongAction): Generator<any, any, AxiosResponse<ApiResponse<any>>> {
   try {
-    const response = yield call(() => fetch(""));
-    yield put(addSong(response.data));
+    const response: AxiosResponse<ApiResponse<any>> = yield call(() => axios.post(apiUrl, action.payload.payload));
+    return response.data;
   } catch (error) {
     console.error("Error adding song:", error);
+    throw error;
   }
 }
 
-function* updateSongAsync(action: { payload: any }): Generator<any, void, any> {
+function* updateSongInApi(action: AddSongAction): Generator<any, any, AxiosResponse<ApiResponse<any>>> {
   try {
-    const response = yield call(() => fetch(""));
-    yield put(updateSong(response.data));
+    const { id, updatedSong } = action.payload.payload;
+    const response: AxiosResponse<ApiResponse<any>> = yield call(() => axios.put(`${apiUrl}/${id}`, updatedSong));
+    return response.data;
   } catch (error) {
     console.error("Error updating song:", error);
+    throw error;
   }
 }
 
-function* deleteSongAsync(action: { payload: any }): Generator<any, void, any> {
+function* deleteSongFromApi(action: AddSongAction): Generator<any, any, AxiosResponse<ApiResponse<any>>> {
   try {
-    yield call(() => fetch(""));
-    yield put(deleteSong(action.payload));
+    const { id } = action.payload.payload;
+    const response: AxiosResponse<ApiResponse<any>> = yield call(() => axios.delete(`${apiUrl}/${id}`));
+    return response.data;
   } catch (error) {
     console.error("Error deleting song:", error);
+    throw error;
+  }
+}
+
+function* workGetSongsFetch(): Generator<any, void, any> {
+  try {
+    const formattedSongsShortened = yield fetchSongsFromApi();
+    yield put(getSongsSuccess(formattedSongsShortened));
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function* addSongAsync(action: AddSongAction): Generator<any, void, any> {
+  try {
+    const addedSong = yield addSongToApi(action);
+    yield put(addSong(addedSong));
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function* updateSongAsync(action: AddSongAction): Generator<any, void, any> {
+  try {
+    const updatedSong = yield updateSongInApi(action);
+    yield put(updateSong(updatedSong));
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function* deleteSongAsync(action: AddSongAction): Generator<any, void, any> {
+  try {
+    yield deleteSongFromApi(action);
+    yield put(deleteSong(action.payload.payload));
+  } catch (error) {
+    console.log(error);
   }
 }
 
 function* songSaga() {
   yield takeEvery("songs/getSongsFetch", workGetSongsFetch);
-  yield takeLatest("song/fetchSongs", fetchSongsAsync);
-  //   yield takeLatest("song/addSong", addSongAsync);
-  //   yield takeLatest("song/updateSong", updateSongAsync);
-  //   yield takeLatest("song/deleteSong", deleteSongAsync);
+  yield takeLatest("songs/addSong", addSongAsync);
+  yield takeLatest("songs/updateSong", updateSongAsync);
+  yield takeLatest("songs/deleteSong", deleteSongAsync);
 }
+
 export default songSaga;

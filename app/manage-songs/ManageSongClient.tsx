@@ -5,10 +5,36 @@ import Heading from "../components/Heading";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import ActionBtn from "../components/ActionBtn";
 import { MdCached, MdDelete, MdRemoveRedEye } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/hooks/rootReducer";
+import { useCallback, useEffect } from "react";
+import { getSongsFetch } from "@/hooks/songSlice";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const ManageSongClient = () => {
+  const songsState = useSelector((state: RootState) => state.songs);
+  const dispatch=useDispatch()
+  const songsArray = songsState.songs?.songs || [];
+  console.log(songsArray)
+  
+  useEffect(()=>{
+dispatch(getSongsFetch())
+  },[dispatch])
   let rows: any = [];
   const router = useRouter();
+  if(songsArray ){
+    rows=songsArray.map((product: { _id: any; title: any; artist: any; album: any; generes: any})=>{
+        return {
+            id:product._id,
+            title:product.title,
+            artist:product.artist,
+            album:product.album,
+            generes:product.generes,
+            
+        }
+    });
+ }
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
     { field: "title", headerName: "Title", width: 150 },
@@ -28,11 +54,13 @@ const ManageSongClient = () => {
         return (
           <div className="flex justify-between gap-4 w-full">
             <ActionBtn icon={MdCached} onClick={() => {}} />
-            <ActionBtn icon={MdDelete} onClick={() => {}} />
+            <ActionBtn icon={MdDelete} onClick={() => {
+                 handleDelete(params.row.id)
+            }} />
             <ActionBtn
               icon={MdRemoveRedEye}
               onClick={() => {
-                router.push(`product/${params.row.id}`);
+                router.push(`edit/${params.row.id}`);
               }}
             />
           </div>
@@ -40,6 +68,19 @@ const ManageSongClient = () => {
       },
     },
   ];
+
+  const handleDelete=useCallback(async(id:string)=>{
+    toast('Deleting product,please wait')
+   
+    axios.delete(`https://backend-ipfr.onrender.com/api/${id}`).then((res)=>{
+        toast.success("product deleted")
+        router.refresh()
+    }).catch((err)=>{
+        toast.error("Failed to delete product")
+        console.log(err);
+    })
+ },[])
+
   return (
     <div className="max-w-[1150px] m-auto text-xl">
       <div className="mb-4 mt-8">
