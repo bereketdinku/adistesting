@@ -7,7 +7,7 @@ import ActionBtn from "../components/ActionBtn";
 import { MdCached, MdDelete, MdRemoveRedEye } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/hooks/rootReducer";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { deleteSong, getSongsFetch } from "@/hooks/songSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -21,7 +21,7 @@ const ManageSongClient = () => {
   useEffect(()=>{
 dispatch(getSongsFetch())
   },[dispatch])
-  let rows: any = [];
+  let  [rows, setRows] = useState<any[]>([])
   const router = useRouter();
   if(songsArray ){
     rows=songsArray.map((product: { _id: any; title: any; artist: any; album: any; generes: any; })=>{
@@ -74,6 +74,7 @@ dispatch(getSongsFetch())
    
     axios.delete(`https://backend-ipfr.onrender.com/api/${id}`).then((res)=>{
         toast.success("product deleted")
+        setRows((prevRows) => prevRows.filter((row) => row.id !== id));
         router.refresh()
         dispatch(deleteSong(id))
     }).catch((err)=>{

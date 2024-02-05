@@ -8,6 +8,7 @@ import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
 import store from "@/store/store";
 import SongProvider from "@/providers/SongProvider";
+import { Toaster } from "react-hot-toast";
 // import rootReducer from './yourRootReducer'; // Import your actual root reducer
 
 // sagaMiddleware.run(songSaga);
@@ -29,7 +30,9 @@ export default function RootLayout({
         <SongProvider>
           <div className="flex flex-col min-h-screen">
             <NavBar />
-            <main className="flex-grow">{children}</main>
+            <main className="flex-grow">
+            <Toaster position="top-center" />
+              {children}</main>
           </div>
         </SongProvider>
         {/* </Provider> */}
