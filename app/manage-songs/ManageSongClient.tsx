@@ -1,5 +1,5 @@
 "use client";
-
+import { css } from '@emotion/react';
 import { useRouter } from "next/navigation";
 import Heading from "../components/Heading";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -8,7 +8,7 @@ import { MdCached, MdDelete, MdRemoveRedEye } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/hooks/rootReducer";
 import { useCallback, useEffect } from "react";
-import { getSongsFetch } from "@/hooks/songSlice";
+import { deleteSong, getSongsFetch } from "@/hooks/songSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 
@@ -75,6 +75,7 @@ dispatch(getSongsFetch())
     axios.delete(`https://backend-ipfr.onrender.com/api/${id}`).then((res)=>{
         toast.success("product deleted")
         router.refresh()
+        dispatch(deleteSong(id))
     }).catch((err)=>{
         toast.error("Failed to delete product")
         console.log(err);
