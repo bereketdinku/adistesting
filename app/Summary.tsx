@@ -30,7 +30,7 @@ dispatch(getSongsFetch())
   
   useEffect(() => {
     const calculateSummary = () => {
-      const songsArray = songsState.songs?.songs|| []; // Access the songs array within the object
+      const songsArray = songsState.songs|| []; // Access the songs array within the object
     
       let totalSongs = songsArray.length;
       let uniqueAlbums = new Set<string>();

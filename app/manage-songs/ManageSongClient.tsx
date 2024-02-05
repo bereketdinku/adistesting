@@ -15,7 +15,7 @@ import axios from "axios";
 const ManageSongClient = () => {
   const songsState = useSelector((state: RootState) => state.songs);
   const dispatch=useDispatch()
-  const songsArray = songsState.songs?.songs || [];
+  const songsArray = songsState.songs || [];
   console.log(songsState)
   
   useEffect(()=>{
@@ -24,7 +24,7 @@ dispatch(getSongsFetch())
   let rows: any = [];
   const router = useRouter();
   if(songsArray ){
-    rows=songsArray.map((product: { _id: any; title: any; artist: any; album: any; generes: any})=>{
+    rows=songsArray.map((product: { _id: any; title: any; artist: any; album: any; generes: any; })=>{
         return {
             id:product._id,
             title:product.title,

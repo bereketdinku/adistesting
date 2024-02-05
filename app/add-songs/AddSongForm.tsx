@@ -42,8 +42,9 @@ const AddSongForm = () => {
         const addedSong = response.data;
 
         // Dispatch the addSong action with the added song data
+        router.push('/manage-songs');
         dispatch(addSong(addedSong));
-
+        
         // Display success toast and refresh page
         toast.success('Song added successfully');
         router.refresh();

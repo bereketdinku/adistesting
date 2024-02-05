@@ -3,7 +3,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 
 // Your Song type (replace with your actual type)
 type SongType = {
-  id: string;
+  _id: string;
   title: string;
   artist: string;
   album: string;
@@ -35,14 +35,14 @@ export const songSlice = createSlice({
       action: PayloadAction<{ id: string; updatedSong: SongType }>
     ) => {
       const { id, updatedSong } = action.payload;
-      const index = state.songs.findIndex((song) => song.id === id);
+      const index = state.songs.findIndex((song) => song._id === id);
       if (index !== -1) {
         state.songs[index] = updatedSong;
       }
     },
     deleteSong: (state, action) => {
       const { id } = action.payload;
-      state.songs = state.songs.filter((song) => song.id !== id);
+      state.songs = state.songs.filter((song) => song._id !== id);
     },
   },
 });
